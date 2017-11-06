@@ -1,6 +1,5 @@
-import java.util.ArrayList;
+import java.util.ArrayList; 
 public class Test {
-
     private static String TABLE_NAME_PRACTICE = "practice";
     private static String[] TABLE_ATTR_PRACTICE = {
                                                    "practice_id serial " +
@@ -44,11 +43,13 @@ public class Test {
                                                    "feat_id integer " +
                                                           "NOT NULL " +
                                                           "REFERENCES " +
-                                                          "features(feat_id)",
+                                                          "features(feat_id) " +
+                                                          "ON DELETE CASCADE",
                                                    "vin integer " +
                                                           "NOT NULL " +
                                                           "REFERENCES " +
-                                                          "car(vin)",
+                                                          "car(vin) " +
+                                                          "ON DELETE CASCADE",
                                                    "PRIMARY KEY(feat_id, vin)"
                                              };
 
@@ -87,11 +88,13 @@ public class Test {
                                                    "trade_id integer " +
                                                           "NOT NULL " +
                                                           "REFERENCES " +
-                                                          "trade_in(trade_id)",
+                                                          "trade_in(trade_id) " +
+                                                          "ON DELETE CASCADE",
                                                    "fin_id integer " +
                                                           "NOT NULL " +
                                                           "REFERENCES " +
-                                                          "financing(fin_id)"
+                                                          "financing(fin_id) " +
+                                                          "ON DELETE CASCADE"
                                              };
 
     private static String TABLE_NAME_FINANCING = "financing";
@@ -143,23 +146,28 @@ public class Test {
                                                    "cus_id integer " +
                                                           "NOT NULL " +
                                                           "REFERENCES " +
-                                                          "customer(cus_id)",
+                                                          "customer(cus_id) " +
+                                                          "ON DELETE CASCADE",
                                                    "vin integer " +
                                                           "NOT NULL " +
                                                           "REFERENCES " +
-                                                          "car(vin)",
+                                                          "car(vin) " +
+                                                          "ON DELETE CASCADE",
                                                    "emp_id integer " +
                                                           "NOT NULL " +
                                                           "REFERENCES " +
-                                                          "employee(emp_id)",
+                                                          "employee(emp_id) " +
+                                                          "ON DELETE CASCADE",
                                                    "payment_id integer " +
                                                           "NOT NULL " +
                                                           "REFERENCES " +
-                                                          "payment(payment_id)",
+                                                          "payment(payment_id) " +
+                                                          "ON DELETE CASCADE",
                                                    "warranty_id integer " +
                                                           "NOT NULL " +
                                                           "REFERENCES " +
-                                                          "warranty(warranty_id)",
+                                                          "warranty(warranty_id) " +
+                                                          "ON DELETE CASCADE",
                                                    "CONSTRAINT value_is_percentage " +
                                                           "CHECK ((" +
                                                           "(tax_rate > (1)::numeric) AND " +
@@ -193,11 +201,13 @@ public class Test {
                                                    "custom_id integer " +
                                                           "NOT NULL " +
                                                           "REFERENCES " +
-                                                          "customization_options(custom_id)",
+                                                          "customization_options(custom_id) " +
+                                                          "ON DELETE CASCADE",
                                                    "sale_id integer " +
                                                           "NOT NULL " +
                                                           "REFERENCES " +
-                                                          "sale(sale_id)",
+                                                          "sale(sale_id) " +
+                                                          "ON DELETE CASCADE",
                                                    "PRIMARY KEY(custom_id, sale_id)"
                                              };
 
@@ -206,40 +216,22 @@ public class Test {
 
         ArrayList<Table> tables = new ArrayList<Table>();
         
-        tables.add(new Table(TABLE_NAME_SALE, TABLE_ATTR_SALE));
-        tables.add(new Table(TABLE_NAME_CAR, TABLE_ATTR_CAR));
-        tables.add(new Table(TABLE_NAME_HAS_FEATURES, TABLE_ATTR_HAS_FEATURES));
-        tables.add(new Table(TABLE_NAME_HAS_CUSTOM, TABLE_ATTR_HAS_CUSTOM));
-        tables.add(new Table(TABLE_NAME_PAYMENT, TABLE_ATTR_PAYMENT));
+        tables.add(new Table(TABLE_NAME_CUSTOM_OPTIONS, TABLE_ATTR_CUSTOM_OPTIONS));
+        tables.add(new Table(TABLE_NAME_FEATURES, TABLE_ATTR_FEATURES));
+        tables.add(new Table(TABLE_NAME_CUSTOMER, TABLE_ATTR_CUSTOMER));
+        tables.add(new Table(TABLE_NAME_EMPLOYEE, TABLE_ATTR_EMPLOYEE));
         tables.add(new Table(TABLE_NAME_TRADE_IN, TABLE_ATTR_TRADE_IN));
         tables.add(new Table(TABLE_NAME_FINANCING, TABLE_ATTR_FINANCING));
-        tables.add(new Table(TABLE_NAME_EMPLOYEE, TABLE_ATTR_EMPLOYEE));
+        tables.add(new Table(TABLE_NAME_PAYMENT, TABLE_ATTR_PAYMENT));
+        tables.add(new Table(TABLE_NAME_CAR, TABLE_ATTR_CAR));
         tables.add(new Table(TABLE_NAME_WARRANTY, TABLE_ATTR_WARRANTY));
-        tables.add(new Table(TABLE_NAME_FEATURES, TABLE_ATTR_FEATURES));
-        tables.add(new Table(TABLE_NAME_CUSTOM_OPTIONS, TABLE_ATTR_CUSTOM_OPTIONS));
-        tables.add(new Table(TABLE_NAME_CUSTOMER, TABLE_ATTR_CUSTOMER));
-        
-        dropTables(tables);
-        /*System.out.println("DROP TABLE IF EXSISTS practice;");
-        System.out.println("CREATE TABLE practice(cus_id serial NOT NULL PRIMARY KEY, name character varying(70) NOT NULL, ref_origin character varying(100) NOT NULL, ref_type character varying(70) NOT NULL);");*/
+        tables.add(new Table(TABLE_NAME_SALE, TABLE_ATTR_SALE));
+        tables.add(new Table(TABLE_NAME_HAS_FEATURES, TABLE_ATTR_HAS_FEATURES));
+        tables.add(new Table(TABLE_NAME_HAS_CUSTOM, TABLE_ATTR_HAS_CUSTOM));
 
-        ArrayList<Table> tables2 = new ArrayList<Table>();
-        
-        tables2.add(new Table(TABLE_NAME_CUSTOM_OPTIONS, TABLE_ATTR_CUSTOM_OPTIONS));
-        tables2.add(new Table(TABLE_NAME_FEATURES, TABLE_ATTR_FEATURES));
-        tables2.add(new Table(TABLE_NAME_CUSTOMER, TABLE_ATTR_CUSTOMER));
-        tables2.add(new Table(TABLE_NAME_EMPLOYEE, TABLE_ATTR_EMPLOYEE));
-        tables2.add(new Table(TABLE_NAME_TRADE_IN, TABLE_ATTR_TRADE_IN));
-        tables2.add(new Table(TABLE_NAME_FINANCING, TABLE_ATTR_FINANCING));
-        tables2.add(new Table(TABLE_NAME_PAYMENT, TABLE_ATTR_PAYMENT));
-        tables2.add(new Table(TABLE_NAME_CAR, TABLE_ATTR_CAR));
-        tables2.add(new Table(TABLE_NAME_WARRANTY, TABLE_ATTR_WARRANTY));
-        tables2.add(new Table(TABLE_NAME_SALE, TABLE_ATTR_SALE));
-        tables2.add(new Table(TABLE_NAME_HAS_FEATURES, TABLE_ATTR_HAS_FEATURES));
-        tables2.add(new Table(TABLE_NAME_HAS_CUSTOM, TABLE_ATTR_HAS_CUSTOM));
-        for(int i = 0; i <= tables2.size() - 1; i++) {
-            if(tables2.get(i) != null)
-               createTable(tables2.get(i));
+        for(int i = 0; i <= tables.size() - 1; i++) {
+            if(tables.get(i) != null)
+               createTable(tables.get(i));
         }
 
         //pulateSales();
@@ -261,21 +253,8 @@ public class Test {
 
     }
 
-    public static void populatePractice() {
-        for(int i = 0; i < 100; i++) {
-            System.out.printf("INSERT INTO practice (practice_int) VALUES (%d);", i);
-            System.out.println();
-        }
-    }
-
-    public static void dropTables(ArrayList<Table> tables) {
-         for(Table t : tables) {
-             System.out.printf("DROP TABLE IF EXISTS %s; \n", t.name);
-         }
-    }
-
     public static void createTable(Table t) {
-
+        System.out.printf("DROP TABLE IF EXISTS %s CASCADE; \n", t.name);
         String str = "";
         str += "CREATE TABLE " + t.name + " ( ";
         for(int i = 0; i < t.attributes.length; i++) {
@@ -285,6 +264,13 @@ public class Test {
         }
         str += " );";
         System.out.println(str);
+    }
+
+    public static void populatePractice() {
+        for(int i = 0; i < 100; i++) {
+            System.out.printf("INSERT INTO practice (practice_int) VALUES (%d);", i);
+            System.out.println();
+        }
     }
 
     public static class Table {
