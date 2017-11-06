@@ -35,6 +35,12 @@ public class Test {
                                                           "NOT NULL"
                                              };
     
+    public static Car[] CARS = { new Car(555555, 10000, "ford", "fusion", 2010, "silver", true, true, .3, 0),
+                                 new Car(666666, 15000, "ford", "focus", 2016, "black", true, true, .5, 0),
+                                 new Car(777777, 9000, "ford", "mustang", 2000, "white", true, true, .1, 0)
+                               };
+
+    
     public static String TABLE_NAME_FEATURES = "features";
     public static String[] TABLE_ATTR_FEATURES = {
                                                    "feat_id serial " +
@@ -79,6 +85,10 @@ public class Test {
                                            new Customer("Emma Peake", "web", "cars.com"),
                                            new Customer("Adam Parr", "tv ad", "channel 3")
                                           };
+
+
+
+
     public static String[] REF_ORIGINS = { "web", "mouth", "tv ad" };
     public static String[] ORIGINS_WEB = { "facebook.com", "cars.com", "carfax.com" };
     public static String[] ORIGINS_TV = { "channel 3", "channel 4", "channel 6" };
@@ -94,14 +104,14 @@ public class Test {
                                                           "NOT NULL",
                                                    "CONSTRAINT value_is_percentage " +
                                                           "CHECK ((" +
-                                                          "(commission > (1)::numeric) AND " +
+                                                          "(commission >= (0)::numeric) AND " +
                                                           "(commission < (100)::numeric) ))"
                                              };
     public static Employee[] EMPLOYEES = { new Employee("Jim Friendly", 30),
                                            new Employee("Diane Graham", 10),
                                            new Employee("Keven Greene", 10),
                                            new Employee("Joshua Fraser", 05),
-                                           new Employee("Brian Morrison", 05)
+                                           new Employee("Brian Morrison", 00)
                                           };
  
     public static String TABLE_NAME_PAYMENT = "payment";
@@ -111,16 +121,21 @@ public class Test {
                                                    "amount money " +
                                                           "NOT NULL",
                                                    "trade_id integer " +
-                                                          "NOT NULL " +
                                                           "REFERENCES " +
                                                           "trade_in(trade_id) " +
                                                           "ON DELETE CASCADE",
                                                    "fin_id integer " +
-                                                          "NOT NULL " +
                                                           "REFERENCES " +
                                                           "financing(fin_id) " +
                                                           "ON DELETE CASCADE"
                                              };
+    
+    public static Payment[] PAYMENTS = { new Payment(10000),
+                                           new Payment(10000, 1),
+                                           new Payment(9000, 1, 2)
+                                          };
+
+
 
     public static String TABLE_NAME_FINANCING = "financing";
     public static String[] TABLE_ATTR_FINANCING = {
@@ -135,26 +150,31 @@ public class Test {
                                                    "addr character varying(100) " +
                                                           "NOT NULL"
                                              };
+    public static Finance[] FINANCING = { new Finance(15000, "bank", "bank of america", "123 Fake St."),
+                                           new Finance(4000, "dealership", "ford", "543 False Ave.")
+                                          };
     
     public static String TABLE_NAME_TRADE_IN = "trade_in";
     public static String[] TABLE_ATTR_TRADE_IN = {
                                                    "trade_id serial " +
                                                           "NOT NULL PRIMARY KEY",
                                                    "vin integer " +
-                                                          "NOT NULL",
+                                                          "NOT NULL " +
+                                                          "REFERENCES " +
+                                                          "car(vin)", 
                                                    "miles integer " +
                                                           "NOT NULL",
                                                    "condition character varying(250) " +
                                                           "NOT NULL",
                                                    "value money " +
-                                                          "NOT NULL",
-                                                   "date date " +
                                                           "NOT NULL"
                                              };
+    public static Tradein[] TRADEINS = { new Tradein(333333, 25000, "good", 5000)
+                                          };
         
     public static String TABLE_NAME_SALE = "sale";
     public static String[] TABLE_ATTR_SALE = {
-                                                   "sale_id integer " +
+                                                   "sale_id serial " +
                                                           "NOT NULL PRIMARY KEY",
                                                    "is_approved boolean " +
                                                           "NOT NULL",
@@ -195,7 +215,7 @@ public class Test {
                                                           "ON DELETE CASCADE",
                                                    "CONSTRAINT value_is_percentage " +
                                                           "CHECK ((" +
-                                                          "(tax_rate > (1)::numeric) AND " +
+                                                          "(tax_rate >= (0)::numeric) AND " +
                                                           "(tax_rate < (100)::numeric) ))"
                                              };
     
@@ -223,7 +243,7 @@ public class Test {
                                                           "NOT NULL PRIMARY KEY",
                                                    "custom_name character varying(70) " +
                                                           "NOT NULL",
-                                                   "cost integer " +
+                                                   "cost money " +
                                                           "NOT NULL"
                                              };
     public static String[] CUSTOM_OPTIONS = {
@@ -245,10 +265,20 @@ public class Test {
                                                           "ON DELETE CASCADE",
                                                    "PRIMARY KEY(custom_id, sale_id)"
                                              };
+     
+
     public static int CAR_YEAR_START = 1997;
     public static int CAR_YEAR_END = 2017;
+    
     public static void main(String args[]) {
 
+        createTables();
+
+        populateTables();
+        
+    }
+
+    public static void createTables() {
         ArrayList<Table> tables = new ArrayList<Table>();
         
         tables.add(new Table(TABLE_NAME_CUSTOM_OPTIONS, TABLE_ATTR_CUSTOM_OPTIONS));
@@ -269,27 +299,6 @@ public class Test {
                createTable(tables.get(i));
         }
 
-        //pulateSales();
-        //populatePractice();
-        
-        populateFeatures();
-        populateCustomOptions();
-        populateWarranties();
-        populateCustomers();
-        populateEmployees();
-        populateCars();
-        /*populateCarFeatures();
-
-        populateEmployees();
-
-        populateWarrantys();
-
-        populateCustomer();
-
-        populateCustomOptions();
-
-        populateSalesPaymentsAndCustoms();*/
-
     }
 
     public static void createTable(Table t) {
@@ -304,6 +313,101 @@ public class Test {
         str += " );";
         System.out.println(str);
     }
+
+    public static void populateTables() {
+        populateFeatures();
+        populateCustomOptions();
+        populateWarranties();
+        populateCustomers();
+        populateEmployees();
+        populateCars();
+        populateSalesPaymentsAndCustoms();
+    }
+
+    public static void populateSalesPaymentsAndCustoms() {
+        String prefix = "INSERT INTO sale (is_approved, price, date, " +
+                                           "emp_requested, tax_rate, " +
+                                           "license_fee, cus_id, vin, " +
+                                           "emp_id, payment_id, warranty_id" +
+                                              ") VALUES (";
+
+        String suffix = ");";
+        populateTradeins();
+        populateFinances();
+        populatePayments();
+        Random rn = new Random();
+        double tax_rate = .05;
+        String date = "01/01/2017";
+
+        for(int i = 0; i < CARS.length; i++) {
+            int vin = CARS[i].vin;
+            int cus_id = rn.nextInt(CUSTOMERS.length - 1) + 1;
+            int emp_id = rn.nextInt(EMPLOYEES.length - 1) + 1;
+            int payment_id = i+1;
+            int warranty_id = rn.nextInt(2) + 1;
+            boolean emp_requested = false;
+            boolean is_approved = false;
+            int price = CARS[i].sticker_price;
+            int license_fee = rn.nextInt(250) + 25;
+
+            String vals = is_approved + ", " + Integer.toString(price) + ", \'" +
+                          date + "\', " + emp_requested + ", "+ Double.toString(tax_rate) +
+                          ", " + Integer.toString(license_fee) + ", " + Integer.toString(cus_id) + 
+                          ", " + Integer.toString(vin) + ", " + Integer.toString(emp_id) + 
+                          ", " + Integer.toString(payment_id) + ", " + Integer.toString(warranty_id);
+
+            System.out.println(prefix + vals + suffix);
+
+        }
+
+    }
+
+    public static void populatePayments() {
+        String prefix = "INSERT INTO payment (amount, trade_id, fin_id) " +
+                                              "VALUES (";
+
+        String suffix = ");";
+        for(Payment p : PAYMENTS) {
+            String vals = "";
+            if(p.trade_id == -1 && p.fin_id == -1) {
+                vals += Integer.toString(p.amount) + ", null, null";
+            }
+            else if(p.trade_id == -1) {
+                vals += Integer.toString(p.amount) + ", null, "+ Integer.toString(p.fin_id);
+            }
+            else if(p.fin_id == -1) {
+                vals += Integer.toString(p.amount) + ", " + Integer.toString(p.trade_id) + ", null";
+            } else {
+                vals += Integer.toString(p.amount) + ", " + Integer.toString(p.trade_id) + ", " + Integer.toString(p.fin_id);
+            }
+            System.out.println(prefix + vals + suffix);
+        }
+
+    }
+
+    public static void populateTradeins() {
+        String prefix = "INSERT INTO trade_in (vin, miles, condition, value) " +
+                                              "VALUES (";
+        String suffix = ");";
+        for(Tradein t : TRADEINS) {
+            String vals = t.vin + ", " + t.miles + ", \'"+t.condition+"\', " +
+                          t.value;
+            System.out.println(prefix + vals + suffix);
+        }
+        
+    }
+    public static void populateFinances() {
+        String prefix = "INSERT INTO financing (amount, type, name, addr) " +
+                                              "VALUES (";
+        String suffix = ");";
+        for(Finance f : FINANCING) {
+            String vals = f.amount + ", \'" + f.type + "\', \'"+f.name+"\', \'" +
+                          f.addr + "\'";
+            System.out.println(prefix + vals + suffix);
+        }
+        
+    }
+
     public static void populateEmployees() {
         String prefix = "INSERT INTO employee (emp_name, commission) " +
                                               "VALUES (";
@@ -382,6 +486,13 @@ public class Test {
         String[] colors = {"red", "black", "silver", "white"};
         String[] models = {"mustang", "focus", "fusion", "taurus"};
 
+        for(Car c : CARS) {
+            String vals = Integer.toString(c.vin)+", "+c.sticker_price+", \'"+
+                               c.make+"\', \'"+c.model+"\', "+Integer.toString(c.year) +
+                               ", \'"+c.color+"\', "+c.is_new+", "+c.is_sold+", "+c.min_price +
+                               ", "+c.mileage;
+            System.out.println(prefix + vals + suffix);
+        }
 
         Random rn = new Random();
         for(int i = CAR_YEAR_START; i < CAR_YEAR_END; i++) {
@@ -457,4 +568,78 @@ public class Test {
             this.ref_origin = ref_origin;
         }
      }
+    public static class Car {
+        public int vin;
+        public int sticker_price;
+        public String make;
+        public String model;
+        public int year;
+        public String color;
+        public boolean is_new;
+        public boolean is_sold;
+        public double min_price;
+        public int mileage;
+
+        public Car(int vin, int s_price, String make, String model, int year,
+                        String color, boolean is_new, boolean is_sold, double min_price, int mileage) {
+            this.vin = vin;
+            this.sticker_price = s_price;
+            this.make = make;
+            this.model = model;
+            this.year = year;
+            this.color = color;
+            this.is_new = is_new;
+            this.is_sold = is_sold;
+            this.min_price = min_price;
+            this.mileage = mileage;
+        }
+     }
+    public static class Payment {
+        public int amount;
+        public int trade_id;
+        public int fin_id;
+
+        public Payment(int amount, int trade_id, int fin_id) {
+            this.amount = amount;
+            this.trade_id = trade_id;
+            this.fin_id = fin_id;
+        }
+        public Payment(int amount, int fin_id) {
+            this.amount = amount;
+            this.fin_id = fin_id;
+            this.trade_id = -1;
+        }
+        public Payment(int amount) {
+            this.amount = amount;
+            this.fin_id = -1;
+            this.trade_id = -1;
+        }
+     }
+    public static class Finance {
+        public int amount;
+        public String type;
+        public String name;
+        public String addr;
+
+        public Finance(int amount, String type, String name, String addr) {
+            this.amount = amount;
+            this.type = type;
+            this.name = name;
+            this.addr = addr;
+        }
+     }
+    public static class Tradein{
+        public int vin;
+        public int miles;
+        public String condition;
+        public int value;
+
+        public Tradein(int vin, int miles, String cond, int val) {
+            this.vin = vin;
+            this.miles = miles;
+            this.condition = cond;
+            this.value = val;
+        }
+     }
+
 }
