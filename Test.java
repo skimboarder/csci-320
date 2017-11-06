@@ -68,15 +68,25 @@ public class Test {
                                                           "NOT NULL PRIMARY KEY",
                                                    "name character varying(70) " +
                                                           "NOT NULL",
-                                                   "ref_origin character varying(70) " +
-                                                          "NOT NULL",
                                                    "ref_type character varying(70) " +
+                                                          "NOT NULL",
+                                                   "ref_origin character varying(70) " +
                                                           "NOT NULL"
                                              };
+    public static Customer[] CUSTOMERS = { new Customer("Frank Murray", "none", "none"),
+                                           new Customer("Jan Scott", "web", "facebook.com"),
+                                           new Customer("Adrian Blake", "mouth", "Emma Peake"),
+                                           new Customer("Emma Peake", "web", "cars.com"),
+                                           new Customer("Adam Parr", "tv ad", "channel 3")
+                                          };
+    public static String[] REF_ORIGINS = { "web", "mouth", "tv ad" };
+    public static String[] ORIGINS_WEB = { "facebook.com", "cars.com", "carfax.com" };
+    public static String[] ORIGINS_TV = { "channel 3", "channel 4", "channel 6" };
+    public static String[] ORIGINS_MOUTH = { "Emma Peake", "Adam Parr", "Jim Friendly" };
 
     public static String TABLE_NAME_EMPLOYEE = "employee";
     public static String[] TABLE_ATTR_EMPLOYEE = {
-                                                   "emp_id integer " +
+                                                   "emp_id serial " +
                                                           "NOT NULL PRIMARY KEY",
                                                    "emp_name character varying(70) " +
                                                           "NOT NULL",
@@ -87,6 +97,12 @@ public class Test {
                                                           "(commission > (1)::numeric) AND " +
                                                           "(commission < (100)::numeric) ))"
                                              };
+    public static Employee[] EMPLOYEES = { new Employee("Jim Friendly", 30),
+                                           new Employee("Diane Graham", 10),
+                                           new Employee("Keven Greene", 10),
+                                           new Employee("Joshua Fraser", 05),
+                                           new Employee("Brian Morrison", 05)
+                                          };
  
     public static String TABLE_NAME_PAYMENT = "payment";
     public static String[] TABLE_ATTR_PAYMENT = {
@@ -259,6 +275,8 @@ public class Test {
         populateFeatures();
         populateCustomOptions();
         populateWarranties();
+        populateCustomers();
+        populateEmployees();
         populateCars();
         /*populateCarFeatures();
 
@@ -286,13 +304,33 @@ public class Test {
         str += " );";
         System.out.println(str);
     }
+    public static void populateEmployees() {
+        String prefix = "INSERT INTO employee (emp_name, commission) " +
+                                              "VALUES (";
+        String suffix = ");";
+        
+        for(int i = 0; i < EMPLOYEES.length; i++) {
+            String val = "\'" + EMPLOYEES[i].name+ "\', " +
+                         EMPLOYEES[i].commission;
+            System.out.println(prefix + val + suffix);
+        }
+    }
+    
+    public static void populateCustomers() {
+        String prefix = "INSERT INTO customer (name, ref_type, ref_origin) " +
+                                              "VALUES (";
+        String suffix = ");";
+        
+        for(int i = 0; i < CUSTOMERS.length; i++) {
+            String val = "\'" + CUSTOMERS[i].name+ "\', \'" + CUSTOMERS[i].ref_type
+                         + "\', \'" + CUSTOMERS[i].ref_origin + "\'";
+            System.out.println(prefix + val + suffix);
+        }
+    }
 
     public static void populateWarranties() {
-
-
         String prefix = "INSERT INTO warranty (type, cost, " +
                                               "duration, miles) VALUES (";
-
         String suffix = ");";
         
         for(int i = 0; i < WARRANTIES.length; i++) {
@@ -301,8 +339,6 @@ public class Test {
                          Integer.toString(WARRANTIES[i].miles) + "";
             System.out.println(prefix + val + suffix);
         }
-        
-    
     }
 
 
@@ -399,4 +435,26 @@ public class Test {
             this.miles = miles;
         }
     }
+
+    public static class Employee {
+        public String name;
+        public int commission;
+
+        public Employee(String name, int commission) {
+            this.name = name;
+            this.commission = commission;
+        }
+     }
+
+    public static class Customer {
+        public String name;
+        public String ref_type;
+        public String ref_origin;
+
+        public Customer(String name, String ref_type, String ref_origin) {
+            this.name = name;
+            this.ref_type = ref_type;
+            this.ref_origin = ref_origin;
+        }
+     }
 }
