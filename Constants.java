@@ -1,7 +1,6 @@
-import java.util.ArrayList; 
-import java.util.Random;
+public final class Constants {
 
-public class Test {
+    public Constants() { }
 
     public static String TABLE_NAME_PRACTICE = "practice";
     public static String[] TABLE_ATTR_PRACTICE = {
@@ -42,10 +41,6 @@ public class Test {
                                                    "feat_name character varying(70) " +
                                                           "NOT NULL"
                                              };
-    public static String[] FEATURES = {
-                                       "AC", "Heated Seats", "Power Windows",
-                                       "Sunroof", "Leather Seats", "Sirius XM Radio"
-                                      };
 
     public static String TABLE_NAME_HAS_FEATURES = "has_features";
     public static String[] TABLE_ATTR_HAS_FEATURES = {
@@ -196,24 +191,14 @@ public class Test {
                                                    "miles integer " +
                                                           "NOT NULL"
                                              };
-    public static Warranty[] WARRANTIES = { new Warranty("Standard", 0, 60, 5000),
-                                            new Warranty("Extended", 100, 120, 10000),
-                                            new Warranty("Limited", 0, 30, 2000)
-                                          };
 
     public static String TABLE_NAME_CUSTOM_OPTIONS = "customization_options";
     public static String[] TABLE_ATTR_CUSTOM_OPTIONS = {
                                                    "custom_id serial " +
                                                           "NOT NULL PRIMARY KEY",
                                                    "custom_name character varying(70) " +
-                                                          "NOT NULL",
-                                                   "cost integer " +
                                                           "NOT NULL"
                                              };
-    public static String[] CUSTOM_OPTIONS = {
-                                       "Sound System", "Paint Trim", "Alarm System",
-                                       "Weather Coating"
-                                      };
 
     public static String TABLE_NAME_HAS_CUSTOM = "has_customization";
     public static String[] TABLE_ATTR_HAS_CUSTOM = {
@@ -231,172 +216,7 @@ public class Test {
                                              };
     public static int CAR_YEAR_START = 1997;
     public static int CAR_YEAR_END = 2017;
-    public static void main(String args[]) {
-
-        ArrayList<Table> tables = new ArrayList<Table>();
-        
-        tables.add(new Table(TABLE_NAME_CUSTOM_OPTIONS, TABLE_ATTR_CUSTOM_OPTIONS));
-        tables.add(new Table(TABLE_NAME_FEATURES, TABLE_ATTR_FEATURES));
-        tables.add(new Table(TABLE_NAME_CUSTOMER, TABLE_ATTR_CUSTOMER));
-        tables.add(new Table(TABLE_NAME_EMPLOYEE, TABLE_ATTR_EMPLOYEE));
-        tables.add(new Table(TABLE_NAME_TRADE_IN, TABLE_ATTR_TRADE_IN));
-        tables.add(new Table(TABLE_NAME_FINANCING, TABLE_ATTR_FINANCING));
-        tables.add(new Table(TABLE_NAME_PAYMENT, TABLE_ATTR_PAYMENT));
-        tables.add(new Table(TABLE_NAME_CAR, TABLE_ATTR_CAR));
-        tables.add(new Table(TABLE_NAME_WARRANTY, TABLE_ATTR_WARRANTY));
-        tables.add(new Table(TABLE_NAME_SALE, TABLE_ATTR_SALE));
-        tables.add(new Table(TABLE_NAME_HAS_FEATURES, TABLE_ATTR_HAS_FEATURES));
-        tables.add(new Table(TABLE_NAME_HAS_CUSTOM, TABLE_ATTR_HAS_CUSTOM));
-
-        for(int i = 0; i <= tables.size() - 1; i++) {
-            if(tables.get(i) != null)
-               createTable(tables.get(i));
-        }
-
-        //pulateSales();
-        //populatePractice();
-        
-        populateFeatures();
-        populateCustomOptions();
-        populateWarranties();
-        populateCars();
-        /*populateCarFeatures();
-
-        populateEmployees();
-
-        populateWarrantys();
-
-        populateCustomer();
-
-        populateCustomOptions();
-
-        populateSalesPaymentsAndCustoms();*/
-
-    }
-
-    public static void createTable(Table t) {
-        System.out.printf("DROP TABLE IF EXISTS %s CASCADE; \n", t.name);
-        String str = "";
-        str += "CREATE TABLE " + t.name + " ( ";
-        for(int i = 0; i < t.attributes.length; i++) {
-            str += t.attributes[i];
-            if(i < t.attributes.length - 1)
-               str += ", ";
-        }
-        str += " );";
-        System.out.println(str);
-    }
-
-    public static void populateWarranties() {
 
 
-        String prefix = "INSERT INTO warranty (type, cost, " +
-                                              "duration, miles) VALUES (";
 
-        String suffix = ");";
-        
-        for(int i = 0; i < WARRANTIES.length; i++) {
-            String val = "\'" + WARRANTIES[i].type+ "\', " + Integer.toString(WARRANTIES[i].cost)
-                         + ", " + Integer.toString(WARRANTIES[i].length) + ", " +
-                         Integer.toString(WARRANTIES[i].miles) + "";
-            System.out.println(prefix + val + suffix);
-        }
-        
-    
-    }
-
-
-    public static void populateFeatures() {
-        String prefix = "INSERT INTO features (feat_id, feat_name) VALUES (";
-
-        String suffix = ");";
-
-        for(int i = 0; i < FEATURES.length; i++) {
-            String val = Integer.toString(i) + ", \'" + FEATURES[i] + "\'";
-            System.out.println(prefix + val + suffix);
-        }
-        
-    }
-    
-    public static void populateCustomOptions() {
-        String prefix = "INSERT INTO customization_options (custom_id, custom_name,"
-                                                  + " cost) VALUES (";
-
-        String suffix = ");";
-
-        Random rn = new Random();
-
-        for(int i = 0; i < FEATURES.length; i++) {
-            int p = rn.nextInt(500) + 25;
-            String val = Integer.toString(i) + ", \'" + FEATURES[i] + "\', "+
-                         Integer.toString(p);
-            System.out.println(prefix + val + suffix);
-        }
-        
-    }
-
-    public static void populateCars() {
-        String prefix = "INSERT INTO car (vin, sticker_price, make, model, " +
-                                          "year, color, is_new, is_sold, " +
-                                          "min_price, mileage) VALUES (";
-
-        String suffix = ");";
-
-        String make = "Ford";
-        String[] colors = {"red", "black", "silver", "white"};
-        String[] models = {"mustang", "focus", "fusion", "taurus"};
-
-
-        Random rn = new Random();
-        for(int i = CAR_YEAR_START; i < CAR_YEAR_END; i++) {
-            for(String s : models) {
-                int vin = 100000 + rn.nextInt(900000);
-                String color = colors[rn.nextInt(3)];
-                String sPrice = Integer.toString(rn.nextInt(15000) + 5000);
-                double mPrice = (rn.nextInt(50) * .01);
-                String mileage = "0";
-              
-                String vals = Integer.toString(vin)+", "+sPrice+", \'"+
-                              make+"\', \'"+s+"\', "+Integer.toString(i)+ ", \'"+color+
-                              "\', true, false, " + Double.toString(mPrice).substring(0,3) +
-                              ", "+mileage;
-
-                System.out.println(prefix + vals + suffix);
-            }
-        } 
-        
-
-    }
-
-    public static void populatePractice() {
-        for(int i = 0; i < 100; i++) {
-
-            System.out.printf("INSERT INTO practice (practice_int) VALUES (%d);", i);
-            System.out.println();
-        }
-    }
-
-    public static class Table {
-    	public String name;
-        public String[] attributes;
-
-    	public Table(String name, String[] attributes) {
-        	this.name = name;
-	        this.attributes = attributes;
-        }
-    }
-
-    public static class Warranty {
-        public String type;
-        public int cost;
-        public int length;
-        public int miles;
-
-        public Warranty(String type, int cost, int length, int miles) {
-            this.type = type;
-            this.cost = cost;
-            this.length = length;
-            this.miles = miles;
-        }
-    }
 }
