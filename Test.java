@@ -126,7 +126,7 @@ public class Test {
                                            new Employee("Joshua Fraser", 05),
                                            new Employee("Brian Morrison", 00),
                                            new Employee("Casey Smith", 10),
-                                           new Employee("Chase Jones", 05),
+                                           new Employee("Chase Jones", 10),
                                            new Employee("Mike Doe", 20),
                                            new Employee("Connor Davis", 15),
                                            new Employee("Ariana Buck", 15)
@@ -200,7 +200,7 @@ public class Test {
                                                           "NOT NULL " +
                                                           "REFERENCES " +
                                                           "car(vin)", 
-                                                   "miles integer " +
+                                                   "mileage integer " +
                                                           "NOT NULL",
                                                    "condition character varying(250) " +
                                                           "NOT NULL",
@@ -317,13 +317,14 @@ public class Test {
                                      " features.feat_name in ('Heated Seats','AC') " +
                                      " GROUP BY car.vin HAVING count(*) = 2);"
                                    };
-    public static String[] TRIGGER_FUNCTIONS = {
-
+    public static String[] TRIGGER_FUNCTIONS = { "create or replace function trade_in_vin_new_or_not() returns trigger as $BODY$ begin if(new.vin = (select vin from car where new.vin = vin)) then update car set is_sold = false, is_new = false, mileage = new.mileage where vin = new.vin; else insert into car(vin, sticker_price, make, model, year, color, is_new, is_sold, min_price, mileage) values (NEW.vin, 5000, 'Toyota', 'Camry', 1997, 'Grey', false, false, 10, new.mileage); end if; return new; end $BODY$ language plpgsql;",
+"create or replace function update_car_on_sale() returns trigger as $BODY$ begin if(new.vin = (select vin from car where new.vin = vin)) then update car set is_sold = true where vin = new.vin; end if; return new; end $BODY$ language plpgsql;"
                                                };
 
-    public static String[] TRIGGERS = {
+    public static String[] TRIGGERS = { "CREATE TRIGGER update_vin_on_trade_in AFTER INSERT ON trade_in FOR EACH ROW EXECUTE PROCEDURE trade_in_vin_new_or_not();",
+                                        "CREATE TRIGGER on_car_sale AFTER INSERT ON sale FOR EACH ROW EXECUTE PROCEDURE update_car_on_sale();"
 
-    }
+    };
 
     public static int CAR_YEAR_START = 1997;
     public static int CAR_YEAR_END = 2017;
@@ -376,6 +377,9 @@ public class Test {
     }
 
     public static void populateTables() {
+        createViews();
+        createTriggerFunctions();
+        createTriggers();
         populateFeatures();
         populateCustomOptions();
         populateWarranties();
@@ -384,8 +388,20 @@ public class Test {
         populateCars();
         populateSalesPaymentsAndCustoms();
         giveCarsFeatures();
-        createViews();
     }
+
+    public static void createTriggerFunctions() {
+         for(String s : TRIGGER_FUNCTIONS) {
+             System.out.println(s);
+         }
+    }
+
+    public static void createTriggers() {
+         for(String s : TRIGGERS) {
+             System.out.println(s);
+         }
+    }
+   
 
     public static void createViews() {
          for(String s : VIEWS) {
@@ -485,7 +501,7 @@ public class Test {
     }
 
     public static void populateTradeins() {
-        String prefix = "INSERT INTO trade_in (vin, miles, condition, value) " +
+        String prefix = "INSERT INTO trade_in (vin, mileage, condition, value) " +
                                               "VALUES (";
         String suffix = ");";
         for(Tradein t : TRADEINS) {
