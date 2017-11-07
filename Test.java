@@ -29,15 +29,28 @@ public class Test {
                                                           "NOT NULL",
                                                    "is_sold boolean " +
                                                           "NOT NULL",
-                                                   "min_price money " +
+                                                   "min_price numeric(5,2) " +
                                                           "NOT NULL",
                                                    "mileage integer " +
                                                           "NOT NULL"
                                              };
     
-    public static Car[] CARS = { new Car(555555, 10000, "ford", "fusion", 2010, "silver", true, true, .3, 0),
-                                 new Car(666666, 15000, "ford", "focus", 2016, "black", true, true, .5, 0),
-                                 new Car(777777, 9000, "ford", "mustang", 2000, "white", true, true, .1, 0)
+    public static Car[] CARS = { new Car(555555, 10000, "ford", "fusion", 2010, "silver", true, false, 70, 0),
+                                 new Car(666666, 15000, "ford", "focus", 2012, "black", true, false, 50, 0),
+                                 new Car(777777, 9000, "ford", "mustang", 2003, "white", true, false, 90, 0),
+                                 new Car(111111, 5000, "ford", "bronco", 1977, "silver", true, false, 70, 0),
+                                 new Car(222222, 20000, "ford", "taurus", 2013, "black", true, false, 50, 0),
+                                 new Car(333333, 18000, "ford", "fiesta", 2003, "white", true, false, 90, 0),
+                                 new Car(444444, 18000, "ford", "mustang", 2011, "silver", true, false, 80, 0),
+                                 new Car(121212, 15000, "ford", "focus", 2013, "black", true, false, 50, 0),
+                                 new Car(232323, 8000, "ford", "mustang", 2004, "white", true, false, 80, 0),
+                                 new Car(343434, 12000, "ford", "fusion", 2005, "silver", true, false, 70, 0),
+                                 new Car(454545, 13000, "ford", "focus", 2016, "black", true, false, 50, 0),
+                                 new Car(565656, 9500, "ford", "escape", 2000, "white", true, false, 70, 0),
+                                 new Car(676767, 12000, "ford", "explorer", 2010, "silver", true, false, 70, 0),
+                                 new Car(787878, 13000, "ford", "explorer", 2016, "black", true, false, 50, 0),
+                                 new Car(898989, 1000, "ford", "escape", 2001, "white", true, false, 60, 0)
+
                                };
 
     
@@ -111,7 +124,12 @@ public class Test {
                                            new Employee("Diane Graham", 10),
                                            new Employee("Keven Greene", 10),
                                            new Employee("Joshua Fraser", 05),
-                                           new Employee("Brian Morrison", 00)
+                                           new Employee("Brian Morrison", 00),
+                                           new Employee("Casey Smith", 10),
+                                           new Employee("Chase Jones", 05),
+                                           new Employee("Mike Doe", 20),
+                                           new Employee("Connor Davis", 15),
+                                           new Employee("Ariana Buck", 15)
                                           };
  
     public static String TABLE_NAME_PAYMENT = "payment";
@@ -131,9 +149,21 @@ public class Test {
                                              };
     
     public static Payment[] PAYMENTS = { new Payment(10000),
-                                           new Payment(10000, 1),
-                                           new Payment(9000, 1, 2)
-                                          };
+                                           new Payment(15000, 1),
+                                           new Payment(9000, 1, 2),
+                                           new Payment(5000),
+                                           new Payment(20000, 3),
+                                           new Payment(18000, 2, 4),
+                                           new Payment(18000),
+                                           new Payment(15000, 5),
+                                           new Payment(8000),
+                                           new Payment(12000, 3, 6),
+                                           new Payment(13000, 7),
+                                           new Payment(9500, 4, 8),
+                                           new Payment(12000),
+                                           new Payment(13000, 9),
+                                           new Payment(1000)
+                                        };
 
 
 
@@ -151,7 +181,15 @@ public class Test {
                                                           "NOT NULL"
                                              };
     public static Finance[] FINANCING = { new Finance(15000, "bank", "bank of america", "123 Fake St."),
-                                           new Finance(4000, "dealership", "ford", "543 False Ave.")
+                                           new Finance(4000, "dealership", "friendly", "543 False Ave."),
+                                           new Finance(20000, "dealership", "friendly", "543 False Ave."),
+                                           new Finance(11000, "bank", "citi bank", "822 Fiction Ct."),
+                                           new Finance(15000, "bank", "citi bank", "822 Fiction Ct."),
+                                           new Finance(6000, "bank", "bank of america", "123 Fake St."),
+                                           new Finance(13000, "manufacture", "ford", "235 Merry Ave."),
+                                           new Finance(4500, "manufacture", "ford", "235 Merry Ave."),
+                                           new Finance(8000, "dealership", "friendly", "543 False Ave.")
+
                                           };
     
     public static String TABLE_NAME_TRADE_IN = "trade_in";
@@ -169,8 +207,12 @@ public class Test {
                                                    "value money " +
                                                           "NOT NULL"
                                              };
-    public static Tradein[] TRADEINS = { new Tradein(333333, 25000, "good", 5000)
-                                          };
+    public static Tradein[] TRADEINS = { new Tradein(222222, 25000, "good", 5000),
+                                         new Tradein(333333, 50000, "good", 5000),
+                                         new Tradein(555555, 5000, "excellent", 6000),
+                                         new Tradein(121212, 10000, "fair", 5000)
+
+                                       };
         
     public static String TABLE_NAME_SALE = "sale";
     public static String[] TABLE_ATTR_SALE = {
@@ -265,11 +307,30 @@ public class Test {
                                                           "ON DELETE CASCADE",
                                                    "PRIMARY KEY(custom_id, sale_id)"
                                              };
-     
+
+    public static String[] VIEWS = { "CREATE VIEW all_new_cars_with_ac_and_heated_seats AS "+
+                                     " SELECT * FROM car WHERE car.vin in ( " +
+                                     " SELECT car.vin FROM car, has_features, features " +
+                                     " WHERE is_new = TRUE AND is_sold = FALSE AND " +
+                                     " has_features.vin = car.vin AND " +
+                                     " features.feat_id = has_features.feat_id AND " +
+                                     " features.feat_name in ('Heated Seats','AC') " +
+                                     " GROUP BY car.vin HAVING count(*) = 2);"
+                                   };
+    public static String[] TRIGGER_FUNCTIONS = {
+
+                                               };
+
+    public static String[] TRIGGERS = {
+
+    }
 
     public static int CAR_YEAR_START = 1997;
     public static int CAR_YEAR_END = 2017;
-    
+  
+
+    public static ArrayList<Integer> CAR_VINS = new ArrayList<Integer>();
+ 
     public static void main(String args[]) {
 
         createTables();
@@ -285,10 +346,10 @@ public class Test {
         tables.add(new Table(TABLE_NAME_FEATURES, TABLE_ATTR_FEATURES));
         tables.add(new Table(TABLE_NAME_CUSTOMER, TABLE_ATTR_CUSTOMER));
         tables.add(new Table(TABLE_NAME_EMPLOYEE, TABLE_ATTR_EMPLOYEE));
+        tables.add(new Table(TABLE_NAME_CAR, TABLE_ATTR_CAR));
         tables.add(new Table(TABLE_NAME_TRADE_IN, TABLE_ATTR_TRADE_IN));
         tables.add(new Table(TABLE_NAME_FINANCING, TABLE_ATTR_FINANCING));
         tables.add(new Table(TABLE_NAME_PAYMENT, TABLE_ATTR_PAYMENT));
-        tables.add(new Table(TABLE_NAME_CAR, TABLE_ATTR_CAR));
         tables.add(new Table(TABLE_NAME_WARRANTY, TABLE_ATTR_WARRANTY));
         tables.add(new Table(TABLE_NAME_SALE, TABLE_ATTR_SALE));
         tables.add(new Table(TABLE_NAME_HAS_FEATURES, TABLE_ATTR_HAS_FEATURES));
@@ -322,6 +383,36 @@ public class Test {
         populateEmployees();
         populateCars();
         populateSalesPaymentsAndCustoms();
+        giveCarsFeatures();
+        createViews();
+    }
+
+    public static void createViews() {
+         for(String s : VIEWS) {
+             System.out.println(s);
+         }
+    }
+
+    public static void giveCarsFeatures() {
+        String prefix = "INSERT INTO has_features (vin, feat_id) " +
+                                              "VALUES (";
+
+        String suffix = ");";
+
+        Random rn = new Random();
+
+        for(int i = 0; i < CAR_VINS.size() - 1; i++) {
+            for(int j = 0; j < FEATURES.length - 1; j++) {
+                String val = "";
+                if(rn.nextBoolean()) {
+                    val += Integer.toString(CAR_VINS.get(i)) + ", " + j;
+                }
+                if(!val.equals(""))
+                    System.out.println(prefix + val + suffix);
+            }
+        }
+
+
     }
 
     public static void populateSalesPaymentsAndCustoms() {
@@ -332,6 +423,10 @@ public class Test {
                                               ") VALUES (";
 
         String suffix = ");";
+
+        String customPrefix = "INSERT INTO has_customization (sale_id, custom_id) " +
+                              "VALUES (";
+
         populateTradeins();
         populateFinances();
         populatePayments();
@@ -345,7 +440,7 @@ public class Test {
             int emp_id = rn.nextInt(EMPLOYEES.length - 1) + 1;
             int payment_id = i+1;
             int warranty_id = rn.nextInt(2) + 1;
-            boolean emp_requested = false;
+            boolean emp_requested = rn.nextBoolean();
             boolean is_approved = false;
             int price = CARS[i].sticker_price;
             int license_fee = rn.nextInt(250) + 25;
@@ -357,6 +452,10 @@ public class Test {
                           ", " + Integer.toString(payment_id) + ", " + Integer.toString(warranty_id);
 
             System.out.println(prefix + vals + suffix);
+            for(int j = 0; j < CUSTOM_OPTIONS.length; j++) {
+                if(rn.nextBoolean())
+                    System.out.println(customPrefix + Integer.toString(i+1) + ", " + Integer.toString(j+1) + ");");
+            }
 
         }
 
@@ -459,16 +558,16 @@ public class Test {
     }
     
     public static void populateCustomOptions() {
-        String prefix = "INSERT INTO customization_options (custom_id, custom_name,"
+        String prefix = "INSERT INTO customization_options (custom_name,"
                                                   + " cost) VALUES (";
 
         String suffix = ");";
 
         Random rn = new Random();
 
-        for(int i = 0; i < FEATURES.length; i++) {
+        for(int i = 0; i < CUSTOM_OPTIONS.length; i++) {
             int p = rn.nextInt(500) + 25;
-            String val = Integer.toString(i) + ", \'" + FEATURES[i] + "\', "+
+            String val = "\' " + CUSTOM_OPTIONS[i] + "\', "+
                          Integer.toString(p);
             System.out.println(prefix + val + suffix);
         }
@@ -498,9 +597,10 @@ public class Test {
         for(int i = CAR_YEAR_START; i < CAR_YEAR_END; i++) {
             for(String s : models) {
                 int vin = 100000 + rn.nextInt(900000);
+                CAR_VINS.add(vin);
                 String color = colors[rn.nextInt(3)];
                 String sPrice = Integer.toString(rn.nextInt(15000) + 5000);
-                double mPrice = (rn.nextInt(50) * .01);
+                double mPrice = rn.nextInt(50);
                 String mileage = "0";
               
                 String vals = Integer.toString(vin)+", "+sPrice+", \'"+
