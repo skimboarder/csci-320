@@ -5,7 +5,7 @@ Clone this repo into your rit cs account on RedDwarf.
 
 To run:
 
-javac Test.java
+javac Test.*
 
 java Test > out.sql
 
