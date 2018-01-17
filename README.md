@@ -5,8 +5,7 @@ Clone this repo into your rit cs account on RedDwarf.
 
 To run:
 
-javac Test.*
-
+javac *.java
 java Test > out.sql
 
 psql -U p32001c -f out.sql
